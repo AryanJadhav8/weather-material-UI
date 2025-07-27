@@ -8,7 +8,7 @@ export default function SearchBox({ updateInfo }) {
     const [error, setError] = useState(false);
 
     const API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-    const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+    const API_KEY = 'bf8a03668e16b5b148e5dd96f8c8f685';
 
     const getWeatherInfo = async () => {
         const response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
