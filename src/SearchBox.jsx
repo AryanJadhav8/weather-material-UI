@@ -3,17 +3,23 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import './SearchBox.css';
 
-export default function SearchBox() {
+export default function SearchBox({ updateInfo }) {
     const [city, setCity] = useState("");
+    const [error, setError] = useState(false);
 
     const API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-    const API_KEY = 'bf8a03668e16b5b148e5dd96f8c8f685';
+    const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 
-    let getWeatherInfo = async (city) =>{
-        let response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
-        let jsonResponse = await response.json();
-        console.log(jsonResponse);
-        let result = {
+    const getWeatherInfo = async () => {
+        const response = await fetch(`${API_URL}?q=${city}&appid=${API_KEY}&units=metric`);
+        const jsonResponse = await response.json();
+
+        if (!response.ok || jsonResponse.cod !== 200) {
+            throw new Error("City not found");
+        }
+
+        return {
+            city: city,
             temp: jsonResponse.main.temp,
             tempMin: jsonResponse.main.temp_min,
             tempMax: jsonResponse.main.temp_max,
@@ -21,23 +27,26 @@ export default function SearchBox() {
             feelsLike: jsonResponse.main.feels_like,
             weather: jsonResponse.weather[0].description,
         };
-        console.log(result);
     };
 
     const handleChange = (evt) => {
         setCity(evt.target.value);
     };
 
-    const handleSubmit = (evt) => {
-        evt.preventDefault(); 
-        console.log(city);    
-        setCity(""); 
-        getWeatherInfo(city);         
+    const handleSubmit = async (evt) => {
+        evt.preventDefault();
+        try {
+            const info = await getWeatherInfo();
+            updateInfo(info);
+            setCity("");
+            setError(false);
+        } catch (err) {
+            setError(true);
+        }
     };
 
     return (
-        <div className='SearchBox'>
-            <h3>Search for the Weather</h3>
+        <div className="SearchBox">
             <form onSubmit={handleSubmit}>
                 <TextField
                     id="city"
@@ -51,6 +60,7 @@ export default function SearchBox() {
                 <Button variant="contained" type="submit">
                     Search
                 </Button>
+                {error && <p style={{color:"red"}}>No such place exists</p>}
             </form>
         </div>
     );

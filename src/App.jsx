@@ -1,14 +1,10 @@
 // import './App.css';
-import SearchBox from "./SearchBox";
+import WeatherApp from "./WeatherApp";
 
 function App() {
-  let handleClick = () => {
-    console.log('Button clicked!');
-  }
-
   return (
     <>
-    <SearchBox />
+    <WeatherApp />
     </>
   );
 }
